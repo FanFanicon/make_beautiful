@@ -6,8 +6,11 @@ use actix_web::{middleware, web, App, HttpRequest, HttpServer,get,Responder,Eith
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware};
 use actix_files;
 
-
-
+#[get("/hello")]
+async fn index() ->HttpResponse{
+   let res=String::from("来自Rust服务器的响应");
+   HttpResponse::Ok().json(res)
+}
 async fn react_index(req_method:Method) ->Result<impl Responder>{
      match req_method{   //匹配当前的请求类型
         Method::GET=>{  //Method是一个枚举类型,Get方法的时候这样子做
@@ -29,7 +32,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             // enable logger
             .wrap(middleware::Logger::default())
-            .service(actix_files::Files::new("/","./dist").index_file("index.html")) //处理静态文件
+            .service(index) //处理静态文件
             .default_service( //解决前端路由刷新页面404问题
                 web::get().to(react_index)
             )
